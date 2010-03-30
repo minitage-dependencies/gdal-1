@@ -1,0 +1,86 @@
+diff -ur gdal-1.6.1/GNUmakefile gdal-1.6.1.new/GNUmakefile
+--- gdal-1.6.1/GNUmakefile	2008-12-15 21:48:07.000000000 +0100
++++ gdal-1.6.1.new/GNUmakefile	2009-12-06 19:27:10.000000000 +0100
+@@ -27,7 +27,7 @@
+ force-lib:
+ 	$(AR) r $(GDAL_LIB) $(GDAL_OBJ)
+ 	$(RANLIB) $(GDAL_LIB)
+-	$(LD_SHARED) $(GDAL_SLIB_SONAME) $(GDAL_OBJ) $(GDAL_LIBS) $(LDFLAGS) $(LIBS) \
++	$(LD_SHARED) $(GDAL_SLIB_SONAME) $(GDAL_OBJ) $(GDAL_LIBS) $(LDFLAGS) -lsqlite3 $(LIBS) \
+ 		-o $(GDAL_SLIB)
+ 
+ $(GDAL_LIB):	$(GDAL_OBJ) GDALmake.opt
+@@ -36,11 +36,11 @@
+ 	$(RANLIB) $(GDAL_LIB)
+ 
+ $(GDAL_SLIB):	$(GDAL_OBJ) $(GDAL_LIB)
+-	$(LD_SHARED) $(GDAL_SLIB_SONAME) $(GDAL_OBJ) $(GDAL_LIBS) $(LDFLAGS) $(LIBS) \
++	$(LD_SHARED) $(GDAL_SLIB_SONAME) $(GDAL_OBJ) $(GDAL_LIBS) $(LDFLAGS) -lsqlite3 $(LIBS) \
+ 		-o $(GDAL_SLIB)
+ 
+ $(LIBGDAL):	$(GDAL_OBJ:.o=.lo)
+-	$(LD) $(LDFLAGS) $(LIBS) -o $@ $(GDAL_OBJ:.o=.lo) \
++	$(LD) $(LDFLAGS) -lsqlite3 $(LIBS) -o $@ $(GDAL_OBJ:.o=.lo) \
+ 	    -rpath $(INST_LIB) \
+ 	    -no-undefined \
+ 	    -version-info $(LIBGDAL_CURRENT):$(LIBGDAL_REVISION):$(LIBGDAL_AGE)
+diff -ur gdal-1.6.1/configure gdal-1.6.1.new/configure
+--- gdal-1.6.1/configure	2009-04-14 18:29:35.000000000 +0200
++++ gdal-1.6.1.new/configure	2009-12-06 19:29:30.000000000 +0100
+@@ -9305,7 +9305,7 @@
+       export_symbols_cmds='$NM $libobjs $convenience | $global_symbol_pipe | $SED -e '\''/^[BCDGRS][ ]/s/.*[ ]\([^ ]*\)/\1 DATA/'\'' | $SED -e '\''/^[AITW][ ]/s/.*[ ]//'\'' | sort | uniq > $export_symbols'
+ 
+       if $LD --help 2>&1 | $GREP 'auto-import' > /dev/null; then
+-        archive_cmds='$CC -shared $libobjs $deplibs $compiler_flags -o $output_objdir/$soname ${wl}--enable-auto-image-base -Xlinker --out-implib -Xlinker $lib'
++        archive_cmds='$CC -shared $libobjs $deplibs $compiler_flags -lpng -o $output_objdir/$soname ${wl}--enable-auto-image-base -Xlinker --out-implib -Xlinker $lib'
+ 	# If the export-symbols file already is a .def file (1st line
+ 	# is EXPORTS), use it as is; otherwise, prepend...
+ 	archive_expsym_cmds='if test "x`$SED 1q $export_symbols`" = xEXPORTS; then
+@@ -9314,7 +9314,7 @@
+ 	  echo EXPORTS > $output_objdir/$soname.def;
+ 	  cat $export_symbols >> $output_objdir/$soname.def;
+ 	fi~
+-	$CC -shared $output_objdir/$soname.def $libobjs $deplibs $compiler_flags -o $output_objdir/$soname ${wl}--enable-auto-image-base -Xlinker --out-implib -Xlinker $lib'
++	$CC -shared $output_objdir/$soname.def $libobjs $deplibs $compiler_flags  -lpng -o $output_objdir/$soname ${wl}--enable-auto-image-base -Xlinker --out-implib -Xlinker $lib'
+       else
+ 	ld_shlibs=no
+       fi
+@@ -12725,7 +12725,7 @@
+         enable_shared_with_static_runtimes_CXX=yes
+ 
+         if $LD --help 2>&1 | $GREP 'auto-import' > /dev/null; then
+-          archive_cmds_CXX='$CC -shared -nostdlib $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags -o $output_objdir/$soname ${wl}--enable-auto-image-base -Xlinker --out-implib -Xlinker $lib'
++          archive_cmds_CXX='$CC -shared -nostdlib $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags -lpng  -o $output_objdir/$soname ${wl}--enable-auto-image-base -Xlinker --out-implib -Xlinker $lib'
+           # If the export-symbols file already is a .def file (1st line
+           # is EXPORTS), use it as is; otherwise, prepend...
+           archive_expsym_cmds_CXX='if test "x`$SED 1q $export_symbols`" = xEXPORTS; then
+@@ -12734,7 +12734,7 @@
+ 	    echo EXPORTS > $output_objdir/$soname.def;
+ 	    cat $export_symbols >> $output_objdir/$soname.def;
+           fi~
+-          $CC -shared -nostdlib $output_objdir/$soname.def $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags -o $output_objdir/$soname ${wl}--enable-auto-image-base -Xlinker --out-implib -Xlinker $lib'
++          $CC -shared -nostdlib $output_objdir/$soname.def $predep_objects $libobjs $deplibs $postdep_objects $compiler_flags -lpng -o $output_objdir/$soname ${wl}--enable-auto-image-base -Xlinker --out-implib -Xlinker $lib'
+         else
+           ld_shlibs_CXX=no
+         fi
+diff -ur gdal-1.6.1/ogr/ogrct.cpp gdal-1.6.1.new/ogr/ogrct.cpp
+--- gdal-1.6.1/ogr/ogrct.cpp	2008-09-16 10:32:39.000000000 +0200
++++ gdal-1.6.1.new/ogr/ogrct.cpp	2009-12-23 21:05:13.562500000 +0100
+@@ -69,7 +69,7 @@
+ 
+ #if (defined(WIN32) || defined(WIN32CE)) && !defined(__MINGW32__)
+ #  define LIBNAME      "proj.dll"
+-#elif defined(__CYGWIN__) || defined(__MINGW32__)
++#elif defined(__MINGW32__)
+ // XXX: If PROJ.4 library was properly built using libtool in Cygwin or MinGW
+ // environments it has the interface version number embedded in the file name
+ // (it is CURRENT-AGE number). If DLL came somewhere else (e.g. from MSVC
+@@ -77,6 +77,8 @@
+ // specify the right library name. By default assume that in Cygwin/MinGW all
+ // components were buit in the same way.
+ #  define LIBNAME      "libproj-0.dll"
++#elif defined(__CYGWIN__)
++#  define LIBNAME      "cygproj-0.dll"
+ #elif defined(__APPLE__)
+ #  define LIBNAME      "libproj.dylib"
+ #else
